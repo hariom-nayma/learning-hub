@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mastery Learning Dashboard</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- HighlightJS styling (Atom One Dark) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+  
+  <!-- Marked JS, Highlight JS, Mermaid JS CDNs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10.2.4/dist/mermaid.min.js"></script>
+
+  <!-- KaTeX for LaTeX math rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <style>
+    :root {
+      --bg-main: #0c0d12;
+      --bg-sidebar: #12131a;
+      --bg-card: #181a24;
+      --border-color: #242736;
+      --text-main: #cdd6f4;
+      --text-muted: #7f849c;
+      --accent: #89b4fa;
+      --accent-hover: #b4befe;
+      --green: #a6e3a1;
+      --red: #f38ba8;
+      --orange: #fab387;
+      --sidebar-width: 320px;
+      --transition-speed: 0.3s;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+      line-height: 1.6;
+    }
+
+    /* Scrollbars styling */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-muted);
+    }
+
+    /* Sidebar Layout */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      flex-shrink: 0;
+      transition: transform var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 100;
+    }
+
+    .sidebar-header {
+      padding: 24px 24px 12px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .sidebar-title-link {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .sidebar-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--accent);
+      cursor: pointer;
+    }
+
+    .sidebar-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 12px 10px 36px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color var(--transition-speed), box-shadow var(--transition-speed);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 10px rgba(137, 180, 250, 0.15);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 0.875rem;
+    }
+
+    /* Tab Switcher */
+    .tab-container {
+      display: flex;
+      background: var(--bg-main);
+      border: 1px solid var(--border-color);
+      padding: 4px;
+      border-radius: 8px;
+      margin: 12px 16px 4px 16px;
+      gap: 4px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      padding: 8px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--accent);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Sidebar Navigation List */
+    .sidebar-nav {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .nav-group-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      padding-left: 8px;
+    }
+
+    .nav-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .nav-item-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 12px;
+      color: var(--text-main);
+      text-decoration: none;
+      font-size: 0.875rem;
+      border-radius: 8px;
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+      border-left: 3px solid transparent;
+    }
+
+    .nav-item-link i {
+      width: 16px;
+      text-align: center;
+      color: var(--text-muted);
+      transition: color var(--transition-speed);
+    }
+
+    .nav-item-link:hover {
+      background-color: var(--bg-card);
+      color: var(--accent);
+    }
+
+    .nav-item-link:hover i {
+      color: var(--accent);
+    }
+
+    .nav-item-link.active {
+      background-color: rgba(137, 180, 250, 0.1);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 500;
+    }
+
+    .nav-item-link.active i {
+      color: var(--accent);
+    }
+
+    /* Main Viewport Layout */
+    .main-viewport {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background-color: var(--bg-main);
+      position: relative;
+    }
+
+    /* Header Bar */
+    .header-bar {
+      height: 64px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      background-color: rgba(12, 13, 18, 0.8);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 0;
+      z-index: 90;
+    }
+
+    .toggle-sidebar-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.25rem;
+      cursor: pointer;
+      padding: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color var(--transition-speed);
+    }
+
+    .toggle-sidebar-btn:hover {
+      color: var(--accent);
+    }
+
+    .current-topic-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      background: var(--bg-card);
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+    }
+
+    .current-topic-badge i {
+      color: var(--accent);
+    }
+
+    /* Content Area styling */
+    .content-scrollable {
+      flex: 1;
+      overflow-y: auto;
+      padding: 40px 60px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .content-container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* Markdown Element Styling */
+    .markdown-body {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      color: var(--text-main);
+    }
+
+    .markdown-body h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 12px;
+    }
+
+    .markdown-body h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 36px;
+      margin-bottom: 16px;
+      color: var(--accent-hover);
+    }
+
+    .markdown-body h3 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-top: 24px;
+      margin-bottom: 12px;
+    }
+
+    .markdown-body p {
+      margin-bottom: 20px;
+    }
+
+    .markdown-body a {
+      color: var(--accent);
+      text-decoration: none;
+      transition: text-decoration var(--transition-speed);
+    }
+
+    .markdown-body a:hover {
+      text-decoration: underline;
+    }
+
+    .markdown-body hr {
+      border: none;
+      height: 1px;
+      background-color: var(--border-color);
+      margin: 32px 0;
+    }
+
+    .markdown-body blockquote {
+      border-left: 4px solid var(--accent);
+      background-color: var(--bg-card);
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      border-radius: 0 8px 8px 0;
+    }
+
+    .markdown-body ul, .markdown-body ol {
+      margin-left: 24px;
+      margin-bottom: 20px;
+    }
+
+    .markdown-body li {
+      margin-bottom: 8px;
+    }
+
+    /* Tables in MD */
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+    }
+
+    .markdown-body th, .markdown-body td {
+      border: 1px solid var(--border-color);
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    .markdown-body th {
+      background-color: var(--bg-card);
+      font-weight: 600;
+    }
+
+    .markdown-body tr:nth-child(even) {
+      background-color: rgba(24, 26, 36, 0.4);
+    }
+
+    /* Code Blocks */
+    .markdown-body pre {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      font-family: 'Fira Code', monospace;
+    }
+
+    .code-header {
+      background-color: rgba(12, 13, 18, 0.4);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color var(--transition-speed);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .copy-btn:hover {
+      color: var(--accent);
+    }
+
+    .markdown-body code {
+      background-color: var(--bg-card);
+      color: var(--orange);
+      font-family: 'Fira Code', monospace;
+      font-size: 0.875rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .markdown-body pre code {
+      display: block;
+      padding: 16px;
+      overflow-x: auto;
+      background-color: transparent;
+      color: var(--text-main);
+    }
+
+    /* Inline highlight override */
+    .markdown-body code.hljs {
+      padding: 0;
+      background: none;
+    }
+
+    /* Images */
+    .image-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 24px 0;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 16px;
+      overflow: hidden;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Mermaid Diagrams Wrapper */
+    .mermaid-container {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+      position: relative;
+    }
+
+    .mermaid-container:hover .diagram-zoom-btn {
+      opacity: 1;
+    }
+
+    .diagram-zoom-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      opacity: 0;
+      background: rgba(137, 180, 250, 0.15);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      transition: opacity 0.2s ease, background 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      z-index: 10;
+    }
+
+    .diagram-zoom-btn:hover {
+      background: rgba(137, 180, 250, 0.3);
+    }
+
+    /* Lightbox Modal */
+    .diagram-lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: rgba(8, 9, 14, 0.94);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      align-items: center;
+      justify-content: center;
+    }
+
+    .diagram-lightbox.open {
+      display: flex;
+      animation: fadeInLB 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeInLB {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .lightbox-inner {
+      position: relative;
+      width: 96vw;
+      height: 94vh;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 32px 100px rgba(0, 0, 0, 0.7);
+      animation: scaleInLB 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes scaleInLB {
+      from { transform: scale(0.95); }
+      to   { transform: scale(1); }
+    }
+
+    .lightbox-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      background: rgba(12, 13, 18, 0.6);
+      flex-shrink: 0;
+    }
+
+    .lightbox-toolbar-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      flex: 1;
+      letter-spacing: 0.03em;
+    }
+
+    .lightbox-btn {
+      background: rgba(137, 180, 250, 0.1);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 0.78rem;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+    }
+
+    .lightbox-btn:hover {
+      background: rgba(137, 180, 250, 0.22);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .lightbox-btn.close-btn {
+      color: var(--red);
+      border-color: rgba(243, 139, 168, 0.3);
+    }
+
+    .lightbox-btn.close-btn:hover {
+      background: rgba(243, 139, 168, 0.15);
+      border-color: var(--red);
+    }
+
+    .lightbox-viewport {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-canvas {
+      cursor: grab;
+      transform-origin: center center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+
+    .lightbox-canvas:active { cursor: grabbing; }
+
+    .lightbox-canvas svg {
+      display: block;
+      width: 100% !important;
+      height: auto !important;
+      max-width: 88vw !important;
+      max-height: calc(94vh - 100px) !important;
+    }
+
+    .lightbox-hint {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-size: 0.7rem;
+      color: rgba(127, 132, 156, 0.6);
+      font-family: 'Inter', sans-serif;
+      pointer-events: none;
+      padding: 6px;
+      border-top: 1px solid var(--border-color);
+      background: rgba(12, 13, 18, 0.4);
+      flex-shrink: 0;
+    }
+
+    .mermaid {
+      background-color: transparent;
+    }
+
+    /* KaTeX math rendering overrides for dark theme */
+    .katex { color: var(--text-main); font-size: 1em; }
+    .katex-display { margin: 1.2em 0; overflow-x: auto; }
+    .katex-display > .katex { text-align: center; }
+
+    /* Welcome Screen */
+    .welcome-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px;
+      text-align: center;
+      height: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      color: var(--text-main);
+    }
+
+    .welcome-logo {
+      font-size: 4rem;
+      color: var(--accent);
+      margin-bottom: 24px;
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .welcome-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .welcome-subtitle {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      margin-bottom: 40px;
+      max-width: 600px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 24px;
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent);
+      box-shadow: 0 8px 24px rgba(137, 180, 250, 0.1);
+    }
+
+    .stat-number {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 8px;
+      font-family: 'Outfit', sans-serif;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* Sidebar Collapsed State */
+    .sidebar.collapsed {
+      transform: translateX(-100%);
+      width: 0;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+      }
+      .sidebar.active {
+        transform: translateX(0);
+      }
+      .content-scrollable {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Diagram Lightbox Modal -->
+  <div class="diagram-lightbox" id="diagram-lightbox">
+    <div class="lightbox-inner" id="lightbox-inner">
+      <div class="lightbox-toolbar">
+        <span class="lightbox-toolbar-title"><i class="fa-solid fa-diagram-project"></i>&nbsp; Diagram View</span>
+        <button class="lightbox-btn" id="lb-zoom-in"><i class="fa-solid fa-magnifying-glass-plus"></i> Zoom In</button>
+        <button class="lightbox-btn" id="lb-zoom-out"><i class="fa-solid fa-magnifying-glass-minus"></i> Zoom Out</button>
+        <button class="lightbox-btn" id="lb-reset"><i class="fa-solid fa-expand"></i> Fit</button>
+        <button class="lightbox-btn close-btn" id="lb-close"><i class="fa-solid fa-xmark"></i> Close</button>
+      </div>
+      <div class="lightbox-viewport" id="lightbox-viewport">
+        <div class="lightbox-canvas" id="lightbox-canvas"></div>
+      </div>
+      <div class="lightbox-hint">Scroll to zoom &nbsp;·&nbsp; Drag to pan &nbsp;·&nbsp; ESC to close</div>
+    </div>
+  </div>
+
+  <!-- Navigation Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="#/" class="sidebar-title-link">
+        <div class="sidebar-title">
+          <i class="fa-solid fa-graduation-cap"></i>
+          <span>Learning Hub</span>
+        </div>
+      </a>
+      <div class="sidebar-subtitle">DSA &amp; System Design</div>
+      
+      <div class="search-box">
+        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+        <input type="text" class="search-input" id="search-input" placeholder="Search topics...">
+      </div>
+    </div>
+
+    <!-- Switch Tab Container -->
+    <div class="tab-container">
+      <button class="tab-btn active" id="tab-dsa" onclick="switchTab('dsa')">
+        <i class="fa-solid fa-code"></i> DSA
+      </button>
+      <button class="tab-btn" id="tab-sd" onclick="switchTab('systemDesign')">
+        <i class="fa-solid fa-network-wired"></i> System Design
+      </button>
+    </div>
+
+    <nav class="sidebar-nav" id="sidebar-nav">
+      <!-- Dynamic Catalog Renders Here -->
+    </nav>
+  </aside>
+
+  <!-- Main Content Viewport -->
+  <main class="main-viewport">
+    <div class="header-bar">
+      <button class="toggle-sidebar-btn" id="toggle-sidebar" title="Toggle Sidebar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="current-topic-badge" id="current-topic-badge">
+        <i class="fa-solid fa-book-open"></i>
+        <span id="current-topic-name">Home Dashboard</span>
+      </div>
+      <div></div> <!-- Spacing spacer -->
+    </div>
+    
+    <div class="content-scrollable">
+      <article class="content-container markdown-body" id="content-area">
+        <!-- Rendered Notes or Welcome Card -->
+      </article>
+    </div>
+  </main>
+
+  <script>
+    let catalogData = { dsa: [], systemDesign: [] };
+    let currentTab = 'dsa'; // Default tab
+
+    // Configure Marked Markdown Renderer
+    const renderer = new marked.Renderer();
+    
+    // Customize Code Block Rendering
+    renderer.code = function(code, lang) {
+      if (lang === 'mermaid') {
+        return `<div class="mermaid-container"><div class="mermaid">${code}</div></div>`;
+      }
+      let highlighted = code;
+      try {
+        if (lang && hljs.getLanguage(lang)) {
+          highlighted = hljs.highlight(code, { language: lang }).value;
+        } else {
+          highlighted = hljs.highlightAuto(code).value;
+        }
+      } catch (e) {}
+      
+      return `<pre><div class="code-header"><span class="code-lang">${lang || 'text'}</span><button class="copy-btn" onclick="copyCode(this)"><i class="far fa-copy"></i> Copy</button></div><code class="hljs language-${lang || 'plaintext'}">${highlighted}</code></pre>`;
+    };
+    
+    // Customize Relative Link Resolver
+    renderer.link = function(href, title, text) {
+      // If href is a relative markdown file link
+      if (href.endsWith('.md')) {
+        const currentPath = getHashPath();
+        try {
+          const baseUrl = window.location.origin + '/' + currentPath;
+          const absoluteUrl = new URL(href, baseUrl);
+          const relativeToRootPath = absoluteUrl.pathname.substring(1); // remove leading '/'
+          return `<a href="#/${relativeToRootPath}" title="${title || ''}">${text}</a>`;
+        } catch (e) {
+          console.error("Link resolution error:", e);
+        }
+      }
+      // If legacy file:/// link
+      if (href.startsWith('file:///')) {
+        let relativePath = href;
+        const dsaIndex = href.toLowerCase().indexOf('dsa/');
+        if (dsaIndex !== -1) {
+          relativePath = href.substring(dsaIndex);
+        }
+        return `<a href="#/${relativePath}" title="${title || ''}">${text}</a>`;
+      }
+      return `<a href="${href}" target="_blank" rel="noopener noreferrer" title="${title || ''}">${text}</a>`;
+    };
+
+    // Customize Relative Image/Animation Path Resolver
+    renderer.image = function(href, title, text) {
+      // If image path is relative, resolve it based on the parent folder of the current Markdown file
+      if (href && !href.startsWith('http') && !href.startsWith('/') && !href.startsWith('data:')) {
+        const currentPath = getHashPath(); // e.g., "DSA/Stack Pattern/150-EvaluateRPN.md"
+        const lastSlash = currentPath.lastIndexOf('/');
+        const parentDir = lastSlash !== -1 ? currentPath.substring(0, lastSlash) : '';
+        const resolvedHref = parentDir ? `/${parentDir}/${href}` : `/${href}`;
+        return `<div class="image-container"><img src="${resolvedHref}" alt="${text || ''}" title="${title || ''}"></div>`;
+      }
+      return `<div class="image-container"><img src="${href}" alt="${text || ''}" title="${title || ''}"></div>`;
+    };
+
+    marked.setOptions({ renderer });
+
+    // Initialize Mermaid Configuration
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'dark',
+      securityLevel: 'loose',
+      flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    const toggleSidebarBtn = document.getElementById('toggle-sidebar');
+    const sidebarNav = document.getElementById('sidebar-nav');
+    const contentArea = document.getElementById('content-area');
+    const searchInput = document.getElementById('search-input');
+    const currentTopicName = document.getElementById('current-topic-name');
+
+    // Sidebar Toggling
+    toggleSidebarBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('collapsed');
+      if (window.innerWidth <= 768) {
+        sidebar.classList.toggle('active');
+      }
+    });
+
+    // Detect Tab based on current hash router path
+    function detectTabFromHash() {
+      const path = getHashPath();
+      if (path.startsWith('DSA/')) {
+        currentTab = 'dsa';
+      } else if (path.startsWith('SystemDesign/')) {
+        currentTab = 'systemDesign';
+      }
+      updateTabUI();
+    }
+
+    // Update active visual state of Tab Buttons
+    function updateTabUI() {
+      document.getElementById('tab-dsa').classList.toggle('active', currentTab === 'dsa');
+      document.getElementById('tab-sd').classList.toggle('active', currentTab === 'systemDesign');
+    }
+
+    // Switch Tabs explicitly
+    window.switchTab = function(tab) {
+      currentTab = tab;
+      updateTabUI();
+      renderNavigation(searchInput.value);
+    };
+
+    // Render navigation list on sidebar
+    function renderNavigation(filterText = '') {
+      sidebarNav.innerHTML = '';
+      const filter = filterText.toLowerCase();
+      
+      const currentCatalog = currentTab === 'dsa' ? catalogData.dsa : catalogData.systemDesign;
+
+      if (!currentCatalog || currentCatalog.length === 0) {
+        sidebarNav.innerHTML = '<div style="color:var(--text-muted); padding: 12px 8px; font-size: 0.85rem;">No topics available.</div>';
+        return;
+      }
+
+      currentCatalog.forEach(group => {
+        const filteredItems = group.items.filter(item => 
+          item.title.toLowerCase().includes(filter) ||
+          group.category.toLowerCase().includes(filter)
+        );
+
+        if (filteredItems.length > 0) {
+          const groupDiv = document.createElement('div');
+          
+          const title = document.createElement('h3');
+          title.className = 'nav-group-title';
+          title.innerText = group.category;
+          groupDiv.appendChild(title);
+
+          const list = document.createElement('ul');
+          list.className = 'nav-list';
+
+          filteredItems.forEach(item => {
+            const li = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = `#/${item.path}`;
+            link.className = 'nav-item-link';
+            link.dataset.path = item.path;
+            link.innerHTML = `<i class="fa-solid ${item.icon}"></i><span>${item.title}</span>`;
+            
+            li.appendChild(link);
+            list.appendChild(li);
+          });
+
+          groupDiv.appendChild(list);
+          sidebarNav.appendChild(groupDiv);
+        }
+      });
+      highlightActiveLink();
+    }
+
+    // Highlight active link in sidebar
+    function highlightActiveLink() {
+      const activePath = getHashPath();
+      document.querySelectorAll('.nav-item-link').forEach(link => {
+        if (link.dataset.path === activePath) {
+          link.classList.add('active');
+        } else {
+          link.classList.remove('active');
+        }
+      });
+    }
+
+    // Retrieve clean router hash path
+    function getHashPath() {
+      const hash = window.location.hash;
+      if (!hash || hash === '#/') {
+        return '';
+      }
+      return hash.replace(/^#\//, '');
+    }
+
+    // Render Welcome Screen
+    function showWelcomeScreen() {
+      let dsaCount = 0;
+      catalogData.dsa.forEach(g => dsaCount += g.items.length);
+      
+      let sdCount = 0;
+      catalogData.systemDesign.forEach(g => sdCount += g.items.length);
+
+      contentArea.innerHTML = `
+        <div class="welcome-screen">
+          <div class="welcome-logo"><i class="fa-solid fa-graduation-cap"></i></div>
+          <h1 class="welcome-title">Mastery Learning Dashboard</h1>
+          <p class="welcome-subtitle">A unified portal for tracking Data Structures &amp; Algorithms solutions and System Design notes.</p>
+          
+          <div class="stats-grid">
+            <div class="stat-card" onclick="switchTab('dsa')">
+              <span class="stat-number">${dsaCount}</span>
+              <span class="stat-label">DSA Solutions</span>
+            </div>
+            <div class="stat-card" onclick="switchTab('systemDesign')">
+              <span class="stat-number">${sdCount}</span>
+              <span class="stat-label">System Design Modules</span>
+            </div>
+          </div>
+          
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Select a topic from the sidebar catalog to begin reading.</p>
+        </div>
+      `;
+      currentTopicName.innerText = 'Home Dashboard';
+      document.title = 'Learning Dashboard';
+      highlightActiveLink();
+    }
+
+    // Fetch and display Markdown file
+    async function loadMarkdown(path) {
+      if (!path) {
+        showWelcomeScreen();
+        return;
+      }
+      
+      detectTabFromHash();
+      renderNavigation(searchInput.value);
+
+      contentArea.style.opacity = '0.5';
+      currentTopicName.innerText = 'Loading...';
+      
+      try {
+        const response = await fetch('/' + path);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status} ${response.statusText}`);
+        }
+        
+        const markdown = await response.text();
+        
+        // Parse and render MD
+        contentArea.innerHTML = marked.parse(markdown);
+        
+        // Update headers and badge
+        const h1 = contentArea.querySelector('h1');
+        const title = h1 ? h1.innerText : path.split('/').pop().replace('.md', '');
+        currentTopicName.innerText = title;
+        document.title = `${title} | Learning Hub`;
+
+      } catch (err) {
+        console.error("Markdown Fetch Error:", err);
+        contentArea.innerHTML = `<h1>Error Loading Document</h1>
+          <p>Could not fetch or parse file: <code>${path}</code>.</p>
+          <p>Error details: <code>${err.message}</code></p>
+          <p>Make sure the local server is running by typing <code>node server.js</code> in your terminal.</p>`;
+        currentTopicName.innerText = 'Error';
+      }
+
+      // Render Mermaid Diagrams
+      const mermaidNodes = Array.from(document.querySelectorAll('.mermaid'));
+      for (const node of mermaidNodes) {
+        try {
+          const id = 'mermaid-' + Math.random().toString(36).substr(2, 9);
+          const rawCode = node.textContent;
+          const { svg } = await mermaid.render(id, rawCode);
+          node.innerHTML = svg;
+          node.removeAttribute('data-processed');
+        } catch (mermaidErr) {
+          console.warn("Mermaid diagram error:", mermaidErr.message || mermaidErr);
+          const rawCode = node.textContent || '';
+          node.innerHTML = `<div style="color: var(--red); padding: 16px; font-size: 0.8rem; font-family: 'Fira Code', monospace; white-space: pre-wrap; background: rgba(243, 139, 168, 0.05); border: 1px dashed var(--red); border-radius: 6px; line-height:1.5;">
+            <strong>⚠ Diagram Syntax Error</strong><br><span style="color:var(--text-muted)">${(mermaidErr.message || String(mermaidErr)).split('\n')[0]}</span><br><br><strong>Source:</strong><br>${rawCode.replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+          </div>`;
+        }
+      }
+
+      // Render LaTeX math formulas
+      if (typeof renderMathInElement !== 'undefined') {
+        renderMathInElement(contentArea, {
+          delimiters: [
+            { left: '$$', right: '$$', display: true  },
+            { left: '$',  right: '$',  display: false },
+            { left: '\\(', right: '\\)', display: false },
+            { left: '\\[', right: '\\]', display: true  }
+          ],
+          throwOnError: false
+        });
+      }
+      
+      attachZoomButtons();
+      highlightActiveLink();
+      contentArea.style.opacity = '1';
+      document.querySelector('.content-scrollable').scrollTop = 0;
+    }
+
+    // ── Diagram Lightbox modal functionality ──────────────────────────────
+    const lightbox       = document.getElementById('diagram-lightbox');
+    const lightboxCanvas = document.getElementById('lightbox-canvas');
+    const lbInner        = document.getElementById('lightbox-inner');
+
+    let lbScale = 1, lbX = 0, lbY = 0;
+    let isDragging = false, dragStartX = 0, dragStartY = 0, dragOriginX = 0, dragOriginY = 0;
+
+    function openLightbox(sourceSvgEl) {
+      const clone = sourceSvgEl.cloneNode(true);
+      const origW = parseFloat(clone.getAttribute('width'))  || 800;
+      const origH = parseFloat(clone.getAttribute('height')) || 600;
+
+      if (!clone.getAttribute('viewBox')) {
+        clone.setAttribute('viewBox', `0 0 ${origW} ${origH}`);
+      }
+
+      clone.removeAttribute('width');
+      clone.removeAttribute('height');
+      clone.removeAttribute('style');
+
+      lightboxCanvas.innerHTML = '';
+      lightboxCanvas.appendChild(clone);
+
+      lbScale = 1; lbX = 0; lbY = 0;
+      applyLbTransform();
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open');
+      document.body.style.overflow = '';
+      lightboxCanvas.innerHTML = '';
+    }
+
+    function applyLbTransform() {
+      lightboxCanvas.style.transform = `translate(${lbX}px, ${lbY}px) scale(${lbScale})`;
+    }
+
+    document.getElementById('lb-close').addEventListener('click', closeLightbox);
+    document.getElementById('lb-zoom-in').addEventListener('click',  () => { lbScale = Math.min(lbScale + 0.25, 5);   applyLbTransform(); });
+    document.getElementById('lb-zoom-out').addEventListener('click', () => { lbScale = Math.max(lbScale - 0.25, 0.25); applyLbTransform(); });
+    document.getElementById('lb-reset').addEventListener('click',    () => { lbScale = 1; lbX = 0; lbY = 0; applyLbTransform(); });
+
+    const lbViewport = document.getElementById('lightbox-viewport');
+    lbViewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const delta = e.deltaY > 0 ? -0.12 : 0.12;
+      lbScale = Math.min(Math.max(lbScale + delta, 0.2), 8);
+      applyLbTransform();
+    }, { passive: false });
+
+    lightboxCanvas.addEventListener('mousedown', (e) => {
+      isDragging = true; dragStartX = e.clientX; dragStartY = e.clientY;
+      dragOriginX = lbX; dragOriginY = lbY;
+      lightboxCanvas.style.transition = 'none';
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      lbX = dragOriginX + (e.clientX - dragStartX);
+      lbY = dragOriginY + (e.clientY - dragStartY);
+      applyLbTransform();
+    });
+    window.addEventListener('mouseup', () => {
+      isDragging = false;
+      lightboxCanvas.style.transition = 'transform 0.1s ease';
+    });
+
+    lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+
+    function attachZoomButtons() {
+      document.querySelectorAll('.mermaid-container').forEach(container => {
+        if (container.querySelector('.diagram-zoom-btn')) return;
+        const svg = container.querySelector('svg');
+        if (!svg) return;
+        const btn = document.createElement('button');
+        btn.className = 'diagram-zoom-btn';
+        btn.innerHTML = '<i class="fa-solid fa-up-right-and-down-left-from-center"></i> Enlarge';
+        btn.title = 'Open diagram fullscreen';
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          openLightbox(svg);
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    // Code Block Copy Feature
+    window.copyCode = function(button) {
+      const pre = button.closest('pre');
+      const code = pre.querySelector('code');
+      navigator.clipboard.writeText(code.innerText).then(() => {
+        button.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+        button.style.color = 'var(--green)';
+        setTimeout(() => {
+          button.innerHTML = '<i class="far fa-copy"></i> Copy';
+          button.style.color = 'var(--text-muted)';
+        }, 2000);
+      });
+    };
+
+    // Event Listeners
+    window.addEventListener('hashchange', () => {
+      loadMarkdown(getHashPath());
+      if (window.innerWidth <= 768) {
+        sidebar.classList.remove('active');
+        sidebar.classList.add('collapsed');
+      }
+    });
+    
+    searchInput.addEventListener('input', (e) => {
+      renderNavigation(e.target.value);
+    });
+
+    // Bootstrapping the Dashboard
+    async function boot() {
+      try {
+        const response = await fetch('/api/catalog');
+        if (!response.ok) throw new Error("Failed to load api catalog data");
+        catalogData = await response.json();
+        
+        detectTabFromHash();
+        renderNavigation();
+        loadMarkdown(getHashPath());
+      } catch (err) {
+        console.error("Initialization failed:", err);
+        contentArea.innerHTML = `<h1>Initialization Failed</h1><p>Ensure that <code>node server.js</code> is running at the workspace root.</p>`;
+      }
+    }
+
+    boot();
+  </script>
+</body>
+</html>
