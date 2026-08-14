@@ -828,7 +828,7 @@
           <span>Learning Hub</span>
         </div>
       </a>
-      <div class="sidebar-subtitle">DSA &amp; System Design</div>
+      <div class="sidebar-subtitle">DSA, System Design, DevOps &amp; Interview</div>
       
       <div class="search-box">
         <i class="fa-solid fa-magnifying-glass search-icon"></i>
@@ -843,6 +843,12 @@
       </button>
       <button class="tab-btn" id="tab-sd" onclick="switchTab('systemDesign')">
         <i class="fa-solid fa-network-wired"></i> System Design
+      </button>
+      <button class="tab-btn" id="tab-devops" onclick="switchTab('devops')">
+        <i class="fa-brands fa-docker"></i> DevOps
+      </button>
+      <button class="tab-btn" id="tab-interview" onclick="switchTab('interview')">
+        <i class="fa-solid fa-user-tie"></i> Interview
       </button>
     </div>
 
@@ -872,7 +878,7 @@
   </main>
 
   <script>
-    let catalogData = { dsa: [], systemDesign: [] };
+    let catalogData = { dsa: [], systemDesign: [], devops: [], interview: [] };
     let currentTab = 'dsa'; // Default tab
 
     // Configure Marked Markdown Renderer
@@ -966,6 +972,10 @@
         currentTab = 'dsa';
       } else if (path.startsWith('SystemDesign/')) {
         currentTab = 'systemDesign';
+      } else if (path.startsWith('DevOps/')) {
+        currentTab = 'devops';
+      } else if (path.startsWith('Interview/')) {
+        currentTab = 'interview';
       }
       updateTabUI();
     }
@@ -974,6 +984,8 @@
     function updateTabUI() {
       document.getElementById('tab-dsa').classList.toggle('active', currentTab === 'dsa');
       document.getElementById('tab-sd').classList.toggle('active', currentTab === 'systemDesign');
+      document.getElementById('tab-devops').classList.toggle('active', currentTab === 'devops');
+      document.getElementById('tab-interview').classList.toggle('active', currentTab === 'interview');
     }
 
     // Switch Tabs explicitly
@@ -988,7 +1000,10 @@
       sidebarNav.innerHTML = '';
       const filter = filterText.toLowerCase();
       
-      const currentCatalog = currentTab === 'dsa' ? catalogData.dsa : catalogData.systemDesign;
+      let currentCatalog = catalogData.dsa;
+      if (currentTab === 'systemDesign') currentCatalog = catalogData.systemDesign;
+      if (currentTab === 'devops') currentCatalog = catalogData.devops;
+      if (currentTab === 'interview') currentCatalog = catalogData.interview;
 
       if (!currentCatalog || currentCatalog.length === 0) {
         sidebarNav.innerHTML = '<div style="color:var(--text-muted); padding: 12px 8px; font-size: 0.85rem;">No topics available.</div>';
@@ -1055,25 +1070,39 @@
     // Render Welcome Screen
     function showWelcomeScreen() {
       let dsaCount = 0;
-      catalogData.dsa.forEach(g => dsaCount += g.items.length);
+      (catalogData.dsa || []).forEach(g => dsaCount += g.items.length);
       
       let sdCount = 0;
-      catalogData.systemDesign.forEach(g => sdCount += g.items.length);
+      (catalogData.systemDesign || []).forEach(g => sdCount += g.items.length);
+
+      let devopsCount = 0;
+      (catalogData.devops || []).forEach(g => devopsCount += g.items.length);
+
+      let interviewCount = 0;
+      (catalogData.interview || []).forEach(g => interviewCount += g.items.length);
 
       contentArea.innerHTML = `
         <div class="welcome-screen">
           <div class="welcome-logo"><i class="fa-solid fa-graduation-cap"></i></div>
           <h1 class="welcome-title">Mastery Learning Dashboard</h1>
-          <p class="welcome-subtitle">A unified portal for tracking Data Structures &amp; Algorithms solutions and System Design notes.</p>
+          <p class="welcome-subtitle">A unified portal for tracking Data Structures &amp; Algorithms, System Design, DevOps, and Interview Mastery.</p>
           
-          <div class="stats-grid">
+          <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
             <div class="stat-card" onclick="switchTab('dsa')">
               <span class="stat-number">${dsaCount}</span>
               <span class="stat-label">DSA Solutions</span>
             </div>
             <div class="stat-card" onclick="switchTab('systemDesign')">
               <span class="stat-number">${sdCount}</span>
-              <span class="stat-label">System Design Modules</span>
+              <span class="stat-label">System Design</span>
+            </div>
+            <div class="stat-card" onclick="switchTab('devops')">
+              <span class="stat-number">${devopsCount}</span>
+              <span class="stat-label">DevOps &amp; Docker</span>
+            </div>
+            <div class="stat-card" onclick="switchTab('interview')">
+              <span class="stat-number">${interviewCount}</span>
+              <span class="stat-label">Interview Prep</span>
             </div>
           </div>
           

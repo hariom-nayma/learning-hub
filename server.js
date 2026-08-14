@@ -68,6 +68,18 @@ function selectIcon(category, filename) {
   if (name.includes('food') || name.includes('delivery') || name.includes('swiggy')) return 'fa-utensils';
   if (name.includes('chat') || name.includes('whatsapp') || name.includes('messaging')) return 'fa-comments';
   
+  // DevOps & Docker Patterns
+  if (name.includes('docker')) return 'fa-brands fa-docker';
+  if (name.includes('network')) return 'fa-network-wired';
+  if (name.includes('volume') || name.includes('storage')) return 'fa-database';
+  if (name.includes('compose')) return 'fa-cubes';
+  if (name.includes('security')) return 'fa-shield-halved';
+  if (name.includes('internal') || name.includes('kernel')) return 'fa-microchip';
+  if (name.includes('multistage') || name.includes('build')) return 'fa-layer-group';
+  if (name.includes('optimization')) return 'fa-gauge-high';
+  if (name.includes('kafka')) return 'fa-bolt';
+  if (name.includes('devops')) return 'fa-infinity';
+
   // DSA Patterns
   if (name.includes('array') || name.includes('hashmap') || name.includes('hash')) return 'fa-hashtag';
   if (name.includes('greedy')) return 'fa-lightbulb';
@@ -81,6 +93,17 @@ function selectIcon(category, filename) {
   if (name.includes('sliding') || name.includes('window')) return 'fa-sliders';
   if (name.includes('dynamic') || name.includes('dp')) return 'fa-rotate';
   
+  // Interview Patterns
+  if (name.includes('hr') || name.includes('general') || name.includes('culture')) return 'fa-user-tie';
+  if (name.includes('behavioral') || name.includes('star') || name.includes('conflict') || name.includes('failure')) return 'fa-brain';
+  if (name.includes('resume') || name.includes('project')) return 'fa-file-lines';
+  if (name.includes('incident') || name.includes('p0') || name.includes('situational') || name.includes('scenario') || name.includes('outage') || name.includes('deadline')) return 'fa-triangle-exclamation';
+  if (name.includes('leadership') || name.includes('managerial') || name.includes('mentorship') || name.includes('roadmapping') || name.includes('stakeholder')) return 'fa-users-gear';
+  if (name.includes('role') || name.includes('staff') || name.includes('level') || name.includes('backend') || name.includes('fullstack')) return 'fa-id-badge';
+  if (name.includes('faang') || name.includes('company') || name.includes('startup') || name.includes('fintech') || name.includes('enterprise')) return 'fa-building';
+  if (name.includes('compensation') || name.includes('salary') || name.includes('offer') || name.includes('negotiation')) return 'fa-handshake';
+  if (name.includes('concurrency') || name.includes('thread') || name.includes('oop') || name.includes('cs') || name.includes('memory')) return 'fa-laptop-code';
+
   return 'fa-file-code';
 }
 
@@ -129,9 +152,13 @@ function scanFolder(folderPath, relativePrefix) {
 function getCatalog() {
   const dsaPath = path.join(PUBLIC_DIR, 'DSA');
   const sdPath = path.join(PUBLIC_DIR, 'SystemDesign');
+  const devopsPath = path.join(PUBLIC_DIR, 'DevOps');
+  const interviewPath = path.join(PUBLIC_DIR, 'Interview');
   
   const dsaCatalog = scanFolder(dsaPath, 'DSA');
   const sdCatalog = scanFolder(sdPath, 'SystemDesign');
+  const devopsCatalog = scanFolder(devopsPath, 'DevOps');
+  const interviewCatalog = scanFolder(interviewPath, 'Interview');
   
   // Check if SystemDesign/README.md exists and add it
   const sdReadmePath = path.join(sdPath, 'README.md');
@@ -144,9 +171,33 @@ function getCatalog() {
     });
   }
 
+  // Check if DevOps/README.md exists and add it
+  const devopsReadmePath = path.join(devopsPath, 'README.md');
+  if (fs.existsSync(devopsReadmePath)) {
+    devopsCatalog.unshift({
+      category: "Roadmap",
+      items: [
+        { title: "Docker Mastery Roadmap", path: "DevOps/README.md", icon: "fa-map" }
+      ]
+    });
+  }
+
+  // Check if Interview/README.md exists and add it
+  const interviewReadmePath = path.join(interviewPath, 'README.md');
+  if (fs.existsSync(interviewReadmePath)) {
+    interviewCatalog.unshift({
+      category: "Roadmap",
+      items: [
+        { title: "Master Interview Playbook", path: "Interview/README.md", icon: "fa-map" }
+      ]
+    });
+  }
+
   return {
     dsa: dsaCatalog,
-    systemDesign: sdCatalog
+    systemDesign: sdCatalog,
+    devops: devopsCatalog,
+    interview: interviewCatalog
   };
 }
 
