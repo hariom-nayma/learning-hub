@@ -30,3 +30,10 @@ GET /DSA/Arrays%20+%20HashMap%20Pattern/274-HIndex.md -> 200 OK
 GET /DevOps/1_Docker/03-Dockerfile-Deep-Dive.md -> 200 OK
 GET /DevOps/1_Docker/01-Docker-Fundamentals.md -> 200 OK
 GET /Interview/1_HR_General/01-HR-Fundamentals-and-General-Questions.md -> 200 OK
+GET /Interview/README.md -> 200 OK
+GET /Interview/1_HR_General/01-HR-Fundamentals-and-General-Questions.md -> 200 OK
+GET /Interview/1_HR_General/02-Compensation-Negotiation-and-Closing.md -> 200 OK
+GET /Interview/1_HR_General/01-HR-Fundamentals-and-General-Questions.md -> 200 OK
+GET /Interview/README.md -> 200 OK
+GET /Interview/1_HR_General/02-Compensation-Negotiation-and-Closing.md -> 200 OK
+GET /Interview/1_HR_General/01-HR-Fundamentals-and-General-Questions.md -> 200 OK

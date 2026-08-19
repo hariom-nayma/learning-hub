@@ -53,8 +53,11 @@ flowchart LR
 | **01** | [Compensation & Negotiation](1_HR_General/02-Compensation-Negotiation-and-Closing.md) | Salary expectations, equity/RSUs, counter-offers, leverage scripts, closing |
 | **02** | [STAR Framework Mastery](2_Behavioral/01-STAR-Framework-Mastery.md) | STAR & CAR methodology, turning stories into quantifiable business impact, story bank creation |
 | **02** | [Conflict & Failure Scenarios](2_Behavioral/02-Conflict-Failure-and-Team-Dynamics.md) | Difficult teammates, disagreement with managers/architects, navigating ambiguity, post-mortem learning |
-| **03** | [Core CS & Concurrency](3_Technical/01-Core-CS-OOP-and-Concurrency.md) | OOP vs Functional, Thread safety, Race conditions, Deadlocks, Memory allocation & GC, CPU vs I/O bound |
-| **03** | [Databases & API Architecture](3_Technical/02-Databases-APIs-and-System-Pillars.md) | SQL vs NoSQL, Indexing (B-Tree vs LSM), REST vs gRPC vs GraphQL, Caching strategies, CAP & ACID |
+| **03** | [Core CS & OOP Fundamentals](3_Technical/01-Core-CS-OOP-and-Concurrency.md) | OOP vs Functional, SOLID Principles, Memory allocation & GC (Generational Hypothesis), Heap vs Stack |
+| **03** | [Java Multithreading & Concurrency](3_Technical/05-Multithreading-and-Concurrency-Java.md) | JMM, `volatile`, Locks vs Atomics, `ThreadPoolExecutor`, `CompletableFuture`, Virtual Threads (Java 21) |
+| **03** | [Databases & Storage Systems](3_Technical/02-Databases-and-Storage-Systems.md) | Indexing (B-Tree vs LSM), SQL Isolation levels, MVCC & Lock internals, Sharding & Connection Pool tuning |
+| **03** | [APIs, Protocols & Networking](3_Technical/03-APIs-Protocols-and-Networking.md) | REST vs gRPC vs GraphQL, Rate Limiting, Resilience4j, Idempotent APIs & Horizontal WebSockets |
+| **03** | [Kafka & Distributed Pillars](3_Technical/04-Kafka-Messaging-and-Distributed-Pillars.md) | Kafka What/Why/How in Java, MQs matrix, Topics/Partitions, Rebalancing, EOS & DLT retry patterns |
 | **04** | [Resume & Project Pitch](4_Projects_Resume/01-Resume-Deep-Dive-and-Project-Walkthrough.md) | 2-minute elevator pitch, whiteboarding project architectures, metric justification under scrutiny |
 | **04** | [Defending Architecture & Trade-offs](4_Projects_Resume/02-Defending-Architecture-and-Trade-offs.md) | Defending tech stack decisions, "What would you redesign from scratch?", Handling deep technical follow-ups |
 | **05** | [Production P0 Incidents](5_Situational_Scenarios/01-Production-Incidents-and-P0-Outages.md) | 6-phase incident response: Detect → Triage → Mitigate → Root Cause → Blameless Postmortem → Guardrails |
